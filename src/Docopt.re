@@ -6,8 +6,8 @@ type args = {
   upgradeFinish: bool,
   [@bs.as "<stackName>"]
   stackName: string,
-  [@bs.optional] [@bs.as "<imageName>"]
-  imageName: string,
+  [@bs.as "<imageName>"]
+  imageName: Js.nullable(string),
   [@bs.as "<serviceName>"]
   serviceName: string,
   /* Config options */
@@ -47,9 +47,9 @@ type action =
 [@bs.module "docopt"] [@bs.val] external docopt: string => args = "docopt";
 
 let readName = args =>
-  switch (imageNameGet(args)) {
+  switch (Js.toOption(args->imageNameGet)) {
   | Some(name) => Image(name)
-  | None => Service(serviceNameGet(args))
+  | None => Service(args->serviceNameGet)
   };
 
 let parse = str => {

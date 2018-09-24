@@ -6,10 +6,10 @@ var Docopt = require("docopt");
 
 function readName(args) {
   var match = args["<imageName>"];
-  if (match !== undefined) {
-    return /* Image */Block.__(0, [match]);
-  } else {
+  if (match == null) {
     return /* Service */Block.__(1, [args["<serviceName>"]]);
+  } else {
+    return /* Image */Block.__(0, [match]);
   }
 }
 
