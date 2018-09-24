@@ -1,0 +1,21 @@
+{
+  "name": "reason-rancher-cli",
+  "version": "0.1.0",
+  "main": "src/index.bs.js",
+  "scripts": {
+    "build": "bsb -make-world",
+    "start": "bsb -make-world -w",
+    "clean": "bsb -clean-world"
+  },
+  "keywords": [
+    "BuckleScript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "bs-platform": "^4.0.5"
+  },
+  "dependencies": {
+    "docopt": "^0.6.2"
+  }
+}
