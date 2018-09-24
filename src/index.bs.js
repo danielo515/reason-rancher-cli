@@ -17,7 +17,10 @@ if (typeof match === "number") {
         tmp = "Make an upgrade " + (match[0] + match[1]);
         break;
     case 1 : 
-        tmp = "Finish upgrade " + (match[0] + match[1]);
+        var image = match[1];
+        var tmp$1;
+        tmp$1 = image.tag ? " service " + image[0] : " image " + image[0];
+        tmp = "Finish upgrade " + (match[0] + tmp$1);
         break;
     case 2 : 
         tmp = "Get " + (match[1] + (

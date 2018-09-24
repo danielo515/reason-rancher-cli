@@ -4,6 +4,15 @@
 var Block = require("bs-platform/lib/js/block.js");
 var Docopt = require("docopt");
 
+function readName(args) {
+  var match = args["<imageName>"];
+  if (match !== undefined) {
+    return /* Image */Block.__(0, [match]);
+  } else {
+    return /* Service */Block.__(1, [args["<serviceName>"]]);
+  }
+}
+
 function parse(str) {
   var args = Docopt.docopt(str);
   console.log(args);
@@ -15,7 +24,7 @@ function parse(str) {
   } else if (args["upgrade-finish"]) {
     return /* FinishUpgrade */Block.__(1, [
               args["<stackName>"],
-              args["<imageName>"]
+              readName(args)
             ]);
   } else if (args.config) {
     var match = args.saveEnv;
@@ -31,5 +40,6 @@ function parse(str) {
   }
 }
 
+exports.readName = readName;
 exports.parse = parse;
 /* docopt Not a pure module */

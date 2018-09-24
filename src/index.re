@@ -25,7 +25,10 @@ let help = "
 Js.log(
   switch (Docopt.parse(help)) {
   | Upgrade(stack, image) => "Make an upgrade " ++ stack ++ image
-  | FinishUpgrade(stack, image) => "Finish upgrade " ++ stack ++ image
+  | FinishUpgrade(stack, image) => "Finish upgrade " ++ stack ++ switch image {
+  | Service(name) => " service " ++ name
+  | Image(name) => " image " ++ name
+  };
   | Get(compose, stack) =>
     "Get "
     ++ stack
