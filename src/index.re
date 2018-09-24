@@ -21,7 +21,16 @@ let help = "
     -v --version                    Show the version of the tool
     -n --name        <serviceName>  Selects a service by name. Can contain asterisk (*) wildcards (ej: 'api-*' )
 ";
+[@bs.deriving jsConverter]
+type args = {
+    upgrade: bool,
+    upgradeFinish: bool,
+    config: bool,
+    saveEnv: bool,
+    enviroment: string,
+    print: bool,
+    get: bool,
+};
 
-
-let options = Docopt.parse(help);
-Js.log(options##get);
+let options  = Docopt.parse(help) |> argsFromJs;
+Js.log(options);

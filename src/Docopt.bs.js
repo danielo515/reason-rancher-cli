@@ -3,8 +3,8 @@
 
 var Docopt = require("docopt");
 
-function parse(str) {
-  return Docopt.docopt(str);
+function parse(prim) {
+  return Docopt.docopt(prim);
 }
 
 exports.parse = parse;
