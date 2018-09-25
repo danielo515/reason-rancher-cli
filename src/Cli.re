@@ -9,9 +9,9 @@ type args = {
   [@bs.as "<stackName>"]
   stackName: string,
   [@bs.as "<imageName>"]
-  imageName: Js.nullable(string),
+  imageName: string,
   [@bs.as "<serviceName>"]
-  serviceName: string,
+  serviceName: Js.nullable(string),
   [@bs.as "--environment"]
   enviroment: string,
   /* Config options */
@@ -55,9 +55,9 @@ type action =
 
 
 let readName = args =>
-  switch (args->imageNameGet |> Js.toOption) {
-  | Some(name) => Image(name)
-  | None => Service(args->serviceNameGet)
+  switch (args->serviceNameGet |> Js.toOption) {
+  | Some(name) => Service(name)
+  | None => Image(args->imageNameGet)
   };
 
 module D = Docopt.Parser({type t = args})
@@ -66,7 +66,7 @@ let parse = str => {
   let args = D.parse(str)
   Js.log(args);
   if (upgradeGet(args)) {
-    Upgrade(stackNameGet(args), "pene");
+    Upgrade(stackNameGet(args), args->imageNameGet);
   } else if (upgradeFinishGet(args)) {
     FinishUpgrade(stackNameGet(args), readName(args));
   } else if (configGet(args)) {

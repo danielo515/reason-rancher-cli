@@ -6,11 +6,11 @@ var Curry = require("bs-platform/lib/js/curry.js");
 var Docopt$ReasonRancherCli = require("./Docopt.bs.js");
 
 function readName(args) {
-  var match = args["<imageName>"];
+  var match = args["<serviceName>"];
   if (match == null) {
-    return /* Service */Block.__(1, [args["<serviceName>"]]);
+    return /* Image */Block.__(0, [args["<imageName>"]]);
   } else {
-    return /* Image */Block.__(0, [match]);
+    return /* Service */Block.__(1, [match]);
   }
 }
 
@@ -22,7 +22,7 @@ function parse(str) {
   if (args.upgrade) {
     return /* Upgrade */Block.__(0, [
               args["<stackName>"],
-              "pene"
+              args["<imageName>"]
             ]);
   } else if (args["upgrade-finish"]) {
     return /* FinishUpgrade */Block.__(1, [
