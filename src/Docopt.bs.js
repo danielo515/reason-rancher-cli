@@ -29,14 +29,18 @@ function parse(str) {
   } else if (args.config) {
     var match = args.saveEnv;
     return /* Config */Block.__(3, [match ? /* SaveEnv */0 : /* Print */1]);
+  } else if (args["--version"]) {
+    return /* Version */0;
   } else if (args.get) {
     var match$1 = args.dockerCompose;
+    var match$2 = args["--output"];
     return /* Get */Block.__(2, [
               match$1 ? /* DockerCompose */0 : /* RancherCompose */1,
-              args["<stackName>"]
+              args["<stackName>"],
+              match$2 ? /* Name */[args["<fileName>"]] : /* NoFile */0
             ]);
   } else {
-    return /* Invalid */0;
+    return /* Invalid */1;
   }
 }
 

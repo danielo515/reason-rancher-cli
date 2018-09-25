@@ -24,21 +24,41 @@ let help = "
 
 Js.log(
   switch (Docopt.parse(help)) {
+  | Version => "This is the current version  ..."
   | Upgrade(stack, image) => "Make an upgrade " ++ stack ++ image
-  | FinishUpgrade(stack, image) => "Finish upgrade " ++ stack ++ switch image {
-  | Service(name) => " service " ++ name
-  | Image(name) => " image " ++ name
-  };
-  | Get(compose, stack) =>
-    "Get "
+  | FinishUpgrade(stack, image) =>
+    "Finish upgrade "
+    ++ stack
+    ++ (
+      switch (image) {
+      | Service(name) => " service " ++ name
+      | Image(name) => " image " ++ name
+      }
+    )
+  | Get(compose, stack, outputFile) =>
+    "Get stack "
     ++ stack
     ++ (
       switch (compose) {
       | DockerCompose => " Docker compose"
-      | RancherCompose => " rancher compose"
+      | RancherCompose => " rancherCompose"
       }
     )
-  | Config(action) => "Config stuff"
+    ++ 
+    (
+      switch (outputFile) {
+      | Name(name) => " Output to " ++ name
+      | NoFile => " Output to stdout"
+      }
+    )
+  | Config(action) =>
+    "Config "
+    ++ (
+      switch (action) {
+      | SaveEnv => "save env"
+      | Print => "print"
+      }
+    )
   | Invalid => "Fuck you"
   },
 );

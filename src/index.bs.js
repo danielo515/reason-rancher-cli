@@ -10,7 +10,7 @@ var match = Docopt$ReasonRancherCli.parse(help);
 var tmp;
 
 if (typeof match === "number") {
-  tmp = "Fuck you";
+  tmp = match === 0 ? "This is the current version  ..." : "Fuck you";
 } else {
   switch (match.tag | 0) {
     case 0 : 
@@ -23,12 +23,17 @@ if (typeof match === "number") {
         tmp = "Finish upgrade " + (match[0] + tmp$1);
         break;
     case 2 : 
-        tmp = "Get " + (match[1] + (
-            match[0] ? " rancher compose" : " Docker compose"
-          ));
+        var outputFile = match[2];
+        tmp = "Get stack " + (match[1] + ((
+              match[0] ? " rancherCompose" : " Docker compose"
+            ) + (
+              outputFile ? " Output to " + outputFile[0] : " Output to stdout"
+            )));
         break;
     case 3 : 
-        tmp = "Config stuff";
+        tmp = "Config " + (
+          match[0] ? "print" : "save env"
+        );
         break;
     
   }
