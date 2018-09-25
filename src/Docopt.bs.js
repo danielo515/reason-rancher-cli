@@ -4,12 +4,13 @@
 var Docopt = require("docopt");
 
 function Parser() {
-  var parse = function ($staropt$star, $staropt$star$1, $staropt$star$2, doc) {
+  var parse = function ($staropt$star, $staropt$star$1, $staropt$star$2, version, doc) {
     var help = $staropt$star !== undefined ? $staropt$star : true;
     var options_first = $staropt$star$1 !== undefined ? $staropt$star$1 : false;
     var exit = $staropt$star$2 !== undefined ? $staropt$star$2 : true;
     return Docopt.docopt(doc, {
                 help: help,
+                version: version,
                 options_first: options_first,
                 exit: exit
               });

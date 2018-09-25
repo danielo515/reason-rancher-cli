@@ -17,7 +17,7 @@ function readName(args) {
 var D = Docopt$ReasonRancherCli.Parser(/* module */[]);
 
 function parse(str) {
-  var args = Curry._4(D[/* parse */0], undefined, undefined, undefined, str);
+  var args = Curry._5(D[/* parse */0], undefined, undefined, undefined, undefined, str);
   console.log(args);
   if (args.upgrade) {
     return /* Upgrade */Block.__(0, [
