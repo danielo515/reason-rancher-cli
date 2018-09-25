@@ -31,7 +31,9 @@ type args = {
 type stackName = string;
 type imageName = string;
 type serviceName = string;
-type outputFile = Name(string) | NoFile;
+type outputFile =
+  | Name(string)
+  | NoFile;
 
 type name =
   | Image(imageName)
@@ -53,33 +55,33 @@ type action =
   | Version
   | Invalid;
 
-
 let readName = args =>
   switch (args->serviceNameGet |> Js.toOption) {
   | Some(name) => Service(name)
   | None => Image(args->imageNameGet)
   };
 
-module D = Docopt.Parser({type t = args})
+module D =
+  Docopt.Parser({
+    type t = args;
+  });
 
 let parse = str => {
-  let args = D.parse(str)
+  let args = D.parse(str);
   Js.log(args);
-  if (upgradeGet(args)) {
-    Upgrade(stackNameGet(args), args->imageNameGet);
-  } else if (upgradeFinishGet(args)) {
-    FinishUpgrade(stackNameGet(args), readName(args));
-  } else if (configGet(args)) {
-    Config(saveEnvGet(args) ? SaveEnv : Print);
-  } else if (args->versionGet) {
-    Version;
-  } else if (getGet(args)) {
+  switch (args) {
+  | args when args->upgradeGet =>
+    Upgrade(stackNameGet(args), args->imageNameGet)
+  | args when args->upgradeFinishGet =>
+    FinishUpgrade(stackNameGet(args), readName(args))
+  | args when args->configGet => Config(saveEnvGet(args) ? SaveEnv : Print)
+  | args when args->versionGet => Version
+  | args when args->getGet =>
     Get(
       dockerComposeGet(args) ? DockerCompose : RancherCompose,
       stackNameGet(args),
-      args -> outputGet ? Name(args->fileNameGet) : NoFile
-    );
-  } else {
-    Invalid;
+      args->outputGet ? Name(args->fileNameGet) : NoFile,
+    )
+  | _ => Invalid
   };
 };
