@@ -23,7 +23,7 @@ let help = "
 ";
 
 Js.log(
-  switch (Docopt.parse(help)) {
+  switch (Cli.parse(help)) {
   | Version => "This is the current version  ..."
   | Upgrade(stack, image) => "Make an upgrade " ++ stack ++ image
   | FinishUpgrade(stack, image) =>
