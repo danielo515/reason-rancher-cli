@@ -26,19 +26,22 @@ let help = "
 type prefs = {
   mutable user: string,
   mutable pass: string,
-  mutable env: string
+  mutable env: string,
 };
 
-module Pref = Preferences.Make({ type t = prefs ;});
+module Pref =
+  Preferences.Make({
+    type t = prefs;
+  });
 
-let defaults = prefs(~user="", ~pass="",~env="int");
+let defaults = prefs(~user="", ~pass="", ~env="int");
 
 let prefs = Pref.read("com.rancher.cli", ~defaults);
 
-let saveEnv = (prefs) => {
-  open Belt.Option;
-  map (Env.get("RANCHER_USER"), prefs -> userSet) |> ignore;
-  map (Env.get("RANCHER_PASS"), prefs -> passSet) |> ignore;
+let saveEnv = prefs => {
+  open Util;
+  withOption(prefs->userSet, Env.get("RANCHER_USER"));
+  withOption(prefs->passSet, Env.get("RANCHER_PASS"));
 };
 
 Js.log(
@@ -63,18 +66,21 @@ Js.log(
       | RancherCompose => " rancherCompose"
       }
     )
-    ++ 
-    (
+    ++ (
       switch (outputFile) {
       | Name(name) => " Output to " ++ name
       | NoFile => " Output to stdout"
       }
     )
   | Config(action) =>
-      switch (action) {
-      | SaveEnv => saveEnv(prefs); ""
-      | Print => Js.log(prefs); ""
-      }
+    switch (action) {
+    | SaveEnv =>
+      saveEnv(prefs);
+      "";
+    | Print =>
+      Js.log(prefs);
+      "";
+    }
   | Invalid => "Fuck you"
   },
 );

@@ -2,10 +2,10 @@
 'use strict';
 
 var Curry = require("bs-platform/lib/js/curry.js");
-var Belt_Option = require("bs-platform/lib/js/belt_Option.js");
 var Js_primitive = require("bs-platform/lib/js/js_primitive.js");
 var Cli$ReasonRancherCli = require("./Cli.bs.js");
 var Env$ReasonRancherCli = require("./Env.bs.js");
+var Util$ReasonRancherCli = require("./Util.bs.js");
 var Preferences$ReasonRancherCli = require("./Preferences.bs.js");
 
 var help = "\n rancher-cli\n\n Options can be read from a stored configuration or provided through environment variables.\n If they exist, enviroment variables have preference over stored configurations.\n Accepted env variables are RANCHER_URL, RANCHER_SECRET_KEY, RANCHER_ACCESS_KEY\n\n Usage:\n    rancher-cli upgrade <stackName> <imageName> [-e  <NAME=value>...] [--rancher-env=<name>]\n    rancher-cli upgrade-finish <stackName> (<imageName>|-n <serviceName>)\n    rancher-cli get (dockerCompose|rancherCompose) <stackName> [-o <fileName>] [--rancher-env=<name>]\n    rancher-cli config saveEnv\n    rancher-cli config print\n    rancher-cli -v\n\n\n Options:\n    --rancher-env=<name>            Rancher environment name (stg or int) [default: int]\n    -e --environment <NAME=value>   Adds a new environment variable to the list of already existing environment variables\n    -o --output      <fileName>     Write the result of the command to a file instead of stdout\n    -v --version                    Show the version of the tool\n    -n --name        <serviceName>  Selects a service by name. Can contain asterisk (*) wildcards (ej: 'api-*' )\n";
@@ -21,15 +21,14 @@ var defaults = {
 var prefs = Curry._4(Pref[/* read */0], undefined, Js_primitive.some(defaults), undefined, "com.rancher.cli");
 
 function saveEnv(prefs) {
-  Belt_Option.map(Env$ReasonRancherCli.get("RANCHER_USER"), (function (param) {
+  Util$ReasonRancherCli.withOption((function (param) {
           prefs.user = param;
           return /* () */0;
-        }));
-  Belt_Option.map(Env$ReasonRancherCli.get("RANCHER_PASS"), (function (param) {
-          prefs.pass = param;
-          return /* () */0;
-        }));
-  return /* () */0;
+        }), Env$ReasonRancherCli.get("RANCHER_USER"));
+  return Util$ReasonRancherCli.withOption((function (param) {
+                prefs.pass = param;
+                return /* () */0;
+              }), Env$ReasonRancherCli.get("RANCHER_PASS"));
 }
 
 var match = Cli$ReasonRancherCli.parse(help);
