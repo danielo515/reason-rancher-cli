@@ -16,6 +16,7 @@
     "bs-platform": "^4.0.5"
   },
   "dependencies": {
-    "docopt": "^0.6.2"
+    "docopt": "^0.6.2",
+    "preferences": "^1.0.2"
   }
 }

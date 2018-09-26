@@ -22,6 +22,28 @@ let help = "
     -n --name        <serviceName>  Selects a service by name. Can contain asterisk (*) wildcards (ej: 'api-*' )
 ";
 
+[@bs.deriving abstract]
+type prefs = {
+  mutable user: string,
+  mutable pass: string,
+  mutable env: string,
+};
+
+module Pref =
+  Preferences.Make({
+    type t = prefs;
+  });
+
+let defaults = prefs(~user="", ~pass="", ~env="int");
+
+let prefs = Pref.read("com.rancher.cli", ~defaults);
+
+let saveEnv = prefs => {
+  open Util;
+  withOption(prefs->userSet, Env.get("RANCHER_USER"));
+  withOption(prefs->passSet, Env.get("RANCHER_PASS"));
+};
+
 Js.log(
   switch (Cli.parse(help)) {
   | Version => "This is the current version  ..."
@@ -44,21 +66,21 @@ Js.log(
       | RancherCompose => " rancherCompose"
       }
     )
-    ++ 
-    (
+    ++ (
       switch (outputFile) {
       | Name(name) => " Output to " ++ name
       | NoFile => " Output to stdout"
       }
     )
   | Config(action) =>
-    "Config "
-    ++ (
-      switch (action) {
-      | SaveEnv => "save env"
-      | Print => "print"
-      }
-    )
+    switch (action) {
+    | SaveEnv =>
+      saveEnv(prefs);
+      "";
+    | Print =>
+      Js.log(prefs);
+      "";
+    }
   | Invalid => "Fuck you"
   },
 );
