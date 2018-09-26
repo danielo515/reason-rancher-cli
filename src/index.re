@@ -46,12 +46,22 @@ let saveEnv = prefs => {
   withOption(prefs->urlSet, Env.get("RANCHER_URL"));
 };
 
+let client =
+  Rancher.client(
+    ~user=prefs->userGet,
+    ~pass=prefs->passGet,
+    ~url=prefs->urlGet,
+    "int",
+  );
+
+open Js.Promise;
 switch (Cli.parse(help)) {
 | Version => Js.log("This is the current version  ...")
-| Upgrade(stack, image) => Rancher.upgrade(stack, image)
-| FinishUpgrade(stack, image) => Rancher.upgradeFinish(stack, image)
+| Upgrade(stack, image) => Rancher.upgrade(~stack, ~image, client) |> then_( res => Js.log(res) |> resolve ) |> ignore
+| FinishUpgrade(stack, _image) =>
+  Rancher.upgradeFinish(~client, ~stack, "image") |> ignore
 | Get(compose, stack, outputFile) =>
-  Rancher.get(compose, stack);
+  Rancher.compose(compose, stack);
   Js.log(
     switch (outputFile) {
     | Name(name) => " Output to " ++ name

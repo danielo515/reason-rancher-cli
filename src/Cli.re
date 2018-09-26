@@ -68,7 +68,7 @@ module D =
 
 let parse = str => {
   let args = D.parse(str);
-  Js.log(args);
+  /* Js.log(args); */
   switch (args) {
   | args when args->upgradeGet =>
     Upgrade(stackNameGet(args), args->imageNameGet)

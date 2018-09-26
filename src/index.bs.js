@@ -16,7 +16,8 @@ var Pref = Preferences$ReasonRancherCli.Make(/* module */[]);
 var defaults = {
   user: "",
   pass: "",
-  env: "int"
+  env: "int",
+  url: ""
 };
 
 var prefs = Curry._6(Pref[/* read */0], undefined, Js_primitive.some(defaults), undefined, undefined, undefined, "com.rancher.cli");
@@ -25,12 +26,18 @@ function saveEnv(prefs) {
   Util$ReasonRancherCli.withOption((function (param) {
           prefs.user = param;
           return /* () */0;
-        }), Env$ReasonRancherCli.get("RANCHER_USER"));
+        }), Env$ReasonRancherCli.get("RANCHER_ACCESS_KEY"));
+  Util$ReasonRancherCli.withOption((function (param) {
+          prefs.pass = param;
+          return /* () */0;
+        }), Env$ReasonRancherCli.get("RANCHER_SECRET_KEY"));
   return Util$ReasonRancherCli.withOption((function (param) {
-                prefs.pass = param;
+                prefs.url = param;
                 return /* () */0;
-              }), Env$ReasonRancherCli.get("RANCHER_PASS"));
+              }), Env$ReasonRancherCli.get("RANCHER_URL"));
 }
+
+var client = Rancher$ReasonRancherCli.client(prefs.user, prefs.pass, prefs.url, "int");
 
 var match = Cli$ReasonRancherCli.parse(help);
 
@@ -43,14 +50,16 @@ if (typeof match === "number") {
 } else {
   switch (match.tag | 0) {
     case 0 : 
-        Rancher$ReasonRancherCli.upgrade(match[0], match[1]);
+        Rancher$ReasonRancherCli.upgrade(match[0], match[1], client).then((function (res) {
+                return Promise.resolve((console.log(res), /* () */0));
+              }));
         break;
     case 1 : 
-        Rancher$ReasonRancherCli.upgradeFinish(match[0], match[1]);
+        Rancher$ReasonRancherCli.upgradeFinish(client, match[0], "image");
         break;
     case 2 : 
         var outputFile = match[2];
-        Rancher$ReasonRancherCli.get(match[0], match[1]);
+        Rancher$ReasonRancherCli.compose(match[0], match[1]);
         console.log(outputFile ? " Output to " + outputFile[0] : " Output to stdout");
         break;
     case 3 : 
@@ -69,4 +78,5 @@ exports.Pref = Pref;
 exports.defaults = defaults;
 exports.prefs = prefs;
 exports.saveEnv = saveEnv;
+exports.client = client;
 /* Pref Not a pure module */
