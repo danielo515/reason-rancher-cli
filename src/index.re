@@ -34,7 +34,12 @@ module Pref = Preferences.Make({ type t = prefs ;});
 let defaults = prefs(~user="", ~pass="",~env="int");
 
 let prefs = Pref.read("com.rancher.cli", ~defaults);
-Js.log(prefs);
+
+let saveEnv = (prefs) => {
+  open Belt.Option;
+  map (Env.get("RANCHER_USER"), prefs -> userSet) |> ignore;
+  map (Env.get("RANCHER_PASS"), prefs -> passSet) |> ignore;
+};
 
 Js.log(
   switch (Cli.parse(help)) {
@@ -66,13 +71,10 @@ Js.log(
       }
     )
   | Config(action) =>
-    "Config "
-    ++ (
       switch (action) {
-      | SaveEnv => "save env"
-      | Print => "print"
+      | SaveEnv => saveEnv(prefs); ""
+      | Print => Js.log(prefs); ""
       }
-    )
   | Invalid => "Fuck you"
   },
 );
