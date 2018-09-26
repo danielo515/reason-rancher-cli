@@ -1,17 +1,32 @@
 [@bs.deriving abstract]
 type options = {
-  key: option(string),
+  [@bs.optional] file: string,
+  [@bs.optional] key: string,
   encrypt: bool,
+  format: string,
 };
 
-module type T = { type t; };
+type format =
+  | Json
+  | Yaml;
+let format2str =
+  fun
+  | Json => "json"
+  | Yaml => "yaml";
 
-module Make = (T:T) => {
+module type T = {type t;};
 
-    type defaults = option(T.t);
+module Make = (T: T) => {
+  type defaults = option(T.t);
 
-    [@bs.new] [@bs.module] external preferences: (string, defaults, options) => T.t = "";
-    
-    let read = (~key=?, ~defaults=?, ~encrypt=true, namespace:string) =>
-      preferences(namespace, defaults, options(~key, ~encrypt));
-}
+  [@bs.new] [@bs.module]
+  external preferences: (string, defaults, options) => T.t = "";
+
+  let read =
+      (~key=?, ~defaults=?, ~encrypt=true, ~format=Json, ~file=?, namespace: string) =>
+    preferences(
+      namespace,
+      defaults,
+      options(~key?, ~file?, ~encrypt, ~format=format2str(format),()),
+    );
+};

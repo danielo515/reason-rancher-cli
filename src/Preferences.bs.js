@@ -2,17 +2,35 @@
 'use strict';
 
 var Preferences = require("preferences");
+var Js_primitive = require("bs-platform/lib/js/js_primitive.js");
+
+function format2str(param) {
+  if (param) {
+    return "yaml";
+  } else {
+    return "json";
+  }
+}
 
 function Make() {
-  var read = function (key, defaults, $staropt$star, namespace) {
+  var read = function (key, defaults, $staropt$star, $staropt$star$1, file, namespace) {
     var encrypt = $staropt$star !== undefined ? $staropt$star : true;
-    return new Preferences(namespace, defaults, {
-                key: key,
-                encrypt: encrypt
-              });
+    var format = $staropt$star$1 !== undefined ? $staropt$star$1 : /* Json */0;
+    var tmp = {
+      encrypt: encrypt,
+      format: format ? "yaml" : "json"
+    };
+    if (file !== undefined) {
+      tmp.file = Js_primitive.valFromOption(file);
+    }
+    if (key !== undefined) {
+      tmp.key = Js_primitive.valFromOption(key);
+    }
+    return new Preferences(namespace, defaults, tmp);
   };
   return /* module */[/* read */read];
 }
 
+exports.format2str = format2str;
 exports.Make = Make;
 /* preferences Not a pure module */

@@ -18,7 +18,7 @@ var defaults = {
   env: "int"
 };
 
-var prefs = Curry._4(Pref[/* read */0], undefined, Js_primitive.some(defaults), undefined, "com.rancher.cli");
+var prefs = Curry._6(Pref[/* read */0], undefined, Js_primitive.some(defaults), undefined, undefined, undefined, "com.rancher.cli");
 
 function saveEnv(prefs) {
   Util$ReasonRancherCli.withOption((function (param) {
