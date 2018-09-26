@@ -44,43 +44,22 @@ let saveEnv = prefs => {
   withOption(prefs->passSet, Env.get("RANCHER_PASS"));
 };
 
-Js.log(
-  switch (Cli.parse(help)) {
-  | Version => "This is the current version  ..."
-  | Upgrade(stack, image) => "Make an upgrade " ++ stack ++ image
-  | FinishUpgrade(stack, image) =>
-    "Finish upgrade "
-    ++ stack
-    ++ (
-      switch (image) {
-      | Service(name) => " service " ++ name
-      | Image(name) => " image " ++ name
-      }
-    )
-  | Get(compose, stack, outputFile) =>
-    "Get stack "
-    ++ stack
-    ++ (
-      switch (compose) {
-      | DockerCompose => " Docker compose"
-      | RancherCompose => " rancherCompose"
-      }
-    )
-    ++ (
-      switch (outputFile) {
-      | Name(name) => " Output to " ++ name
-      | NoFile => " Output to stdout"
-      }
-    )
-  | Config(action) =>
-    switch (action) {
-    | SaveEnv =>
-      saveEnv(prefs);
-      "";
-    | Print =>
-      Js.log(prefs);
-      "";
-    }
-  | Invalid => "Fuck you"
-  },
-);
+switch (Cli.parse(help)) {
+| Version => Js.log("This is the current version  ...")
+| Upgrade(stack, image) => Rancher.upgrade(stack, image)
+| FinishUpgrade(stack, image) => Rancher.upgradeFinish(stack, image)
+| Get(compose, stack, outputFile) =>
+  Rancher.get(compose, stack);
+  Js.log(
+    switch (outputFile) {
+    | Name(name) => " Output to " ++ name
+    | NoFile => " Output to stdout"
+    },
+  );
+| Config(action) =>
+  switch (action) {
+  | SaveEnv => saveEnv(prefs)
+  | Print => Js.log(prefs)
+  }
+| Invalid => Js.log("Fuck you")
+};
