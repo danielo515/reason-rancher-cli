@@ -43,9 +43,10 @@ function upgrade(stack, image, client) {
                     var st = Belt_Option.getExn(findStack(stack)(x.data));
                     return client[/* axios */0].get(st.links.services);
                   })).then((function (x) {
-                  return Promise.resolve(/* Ok */Block.__(0, [x.data.data]));
+                  var x$1 = Belt_Option.getExn(findStack(image)(x.data.data));
+                  return Promise.resolve(/* Ok */Block.__(0, [x$1]));
                 })).catch((function () {
-                return Promise.resolve(/* Error */Block.__(1, ["Can not find stack " + stack]));
+                return Promise.resolve(/* Error */Block.__(1, ["Can not find stack " + (stack + (" containing service" + image))]));
               }));
 }
 

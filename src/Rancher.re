@@ -45,8 +45,14 @@ let upgrade = (~stack, ~image, client) => {
        |> Belt.Option.getExn
        |> (st => st##links##services |> Instance.get(client.axios))
      )
-  |> then_(x => Belt.Result.Ok (x##data##data) |> resolve)
-  |> catch( _err => Belt.Result.Error("Can not find stack " ++ stack ) |> resolve)
+  |> then_(x =>
+       x##data##data
+       |> findStack(~name=image)
+       |> Belt.Option.getExn
+       |> x => Belt.Result.Ok(x) |> resolve)
+  |> catch(_err =>
+       Belt.Result.Error("Can not find stack " ++ stack ++ " containing service" ++ image ) |> resolve
+     );
 };
 let upgradeFinish = (~client, ~stack, _name) => {
   open Js.Promise;
@@ -55,6 +61,3 @@ let upgradeFinish = (~client, ~stack, _name) => {
 };
 let compose = (_compose, stack) =>
   Js.log("Getting compose file of " ++ stack);
-
-
-  
