@@ -27,6 +27,7 @@ type prefs = {
   mutable user: string,
   mutable pass: string,
   mutable env: string,
+  mutable url: string,
 };
 
 module Pref =
@@ -34,14 +35,15 @@ module Pref =
     type t = prefs;
   });
 
-let defaults = prefs(~user="", ~pass="", ~env="int");
+let defaults = prefs(~user="", ~pass="", ~env="int", ~url="");
 
 let prefs = Pref.read("com.rancher.cli", ~defaults);
 
 let saveEnv = prefs => {
   open Util;
-  withOption(prefs->userSet, Env.get("RANCHER_USER"));
-  withOption(prefs->passSet, Env.get("RANCHER_PASS"));
+  withOption(prefs->userSet, Env.get("RANCHER_ACCESS_KEY"));
+  withOption(prefs->passSet, Env.get("RANCHER_SECRET_KEY"));
+  withOption(prefs->urlSet, Env.get("RANCHER_URL"));
 };
 
 switch (Cli.parse(help)) {
