@@ -26,6 +26,13 @@ let client = (~user, ~pass, ~url, env) => {
 let findStack = (~name) =>
   Js.Array.find(s => Js.String.(toLowerCase(s##name) == toLowerCase(name)));
 
+let usesImage = (~image) =>
+  Js.Array.filter(
+    Js.String.(
+      x => x##launchConfig##imageUuid |> toLowerCase |> endsWith(image)
+    ),
+  );
+
 let getStacks = client =>
   Js.Promise.(
     Instance.get(client.axios, "v2-beta/projects?name=" ++ client.env)
@@ -47,11 +54,14 @@ let upgrade = (~stack, ~image, client) => {
      )
   |> then_(x =>
        x##data##data
-       |> findStack(~name=image)
-       |> Belt.Option.getExn
-       |> x => Belt.Result.Ok(x) |> resolve)
+       |> usesImage(~image)
+       |> (x => Belt.Result.Ok(x) |> resolve)
+     )
   |> catch(_err =>
-       Belt.Result.Error("Can not find stack " ++ stack ++ " containing service" ++ image ) |> resolve
+       Belt.Result.Error(
+         "Can not find stack '" ++ stack ++ "' containing service with " ++ image,
+       )
+       |> resolve
      );
 };
 let upgradeFinish = (~client, ~stack, _name) => {

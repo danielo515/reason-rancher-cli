@@ -29,6 +29,14 @@ function findStack(name) {
     });
 }
 
+function usesImage(image) {
+  return (function (param) {
+      return param.filter((function (x) {
+                    return x.launchConfig.imageUuid.toLowerCase().endsWith(image);
+                  }));
+    });
+}
+
 function getStacks(client) {
   return client[/* axios */0].get("v2-beta/projects?name=" + client[/* env */1]).then((function (x) {
                   return client[/* axios */0].get(Caml_array.caml_array_get(x.data.data, 0).links.stacks);
@@ -43,10 +51,10 @@ function upgrade(stack, image, client) {
                     var st = Belt_Option.getExn(findStack(stack)(x.data));
                     return client[/* axios */0].get(st.links.services);
                   })).then((function (x) {
-                  var x$1 = Belt_Option.getExn(findStack(image)(x.data.data));
+                  var x$1 = usesImage(image)(x.data.data);
                   return Promise.resolve(/* Ok */Block.__(0, [x$1]));
                 })).catch((function () {
-                return Promise.resolve(/* Error */Block.__(1, ["Can not find stack " + (stack + (" containing service" + image))]));
+                return Promise.resolve(/* Error */Block.__(1, ["Can not find stack '" + (stack + ("' containing service with " + image))]));
               }));
 }
 
@@ -64,6 +72,7 @@ function compose(_, stack) {
 
 exports.client = client;
 exports.findStack = findStack;
+exports.usesImage = usesImage;
 exports.getStacks = getStacks;
 exports.upgrade = upgrade;
 exports.upgradeFinish = upgradeFinish;
