@@ -21,7 +21,7 @@ function client(user, pass, url, env) {
         ];
 }
 
-function findStack(name) {
+function findByName(name) {
   return (function (param) {
       return Js_primitive.undefined_to_opt(param.find((function (s) {
                         return s.name.toLowerCase() === name.toLowerCase();
@@ -45,16 +45,20 @@ function getStacks(client) {
               }));
 }
 
+function findStack(client, stackName) {
+  return getStacks(client).then((function (x) {
+                var st = Belt_Option.getExn(findByName(stackName)(x.data));
+                return client[/* axios */0].get(st.links.services);
+              }));
+}
+
 function upgrade(stack, image, client) {
   console.log("Upgrading " + (stack + (" using " + (image + " image"))));
-  return getStacks(client).then((function (x) {
-                    var st = Belt_Option.getExn(findStack(stack)(x.data));
-                    return client[/* axios */0].get(st.links.services);
-                  })).then((function (x) {
+  return findStack(client, stack).then((function (x) {
                   var x$1 = usesImage(image)(x.data.data);
                   return Promise.resolve(/* Ok */Block.__(0, [x$1]));
                 })).catch((function () {
-                return Promise.resolve(/* Error */Block.__(1, ["Can not find stack '" + (stack + ("' containing service with " + image))]));
+                return Promise.resolve(/* Error */Block.__(1, ["Can not find stack -" + (stack + ("- containing service with " + image))]));
               }));
 }
 
@@ -71,9 +75,10 @@ function compose(_, stack) {
 }
 
 exports.client = client;
-exports.findStack = findStack;
+exports.findByName = findByName;
 exports.usesImage = usesImage;
 exports.getStacks = getStacks;
+exports.findStack = findStack;
 exports.upgrade = upgrade;
 exports.upgradeFinish = upgradeFinish;
 exports.compose = compose;

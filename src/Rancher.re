@@ -23,7 +23,7 @@ let client = (~user, ~pass, ~url, env) => {
     |> Instance.create,
 };
 
-let findStack = (~name) =>
+let findByName = (~name) =>
   Js.Array.find(s => Js.String.(toLowerCase(s##name) == toLowerCase(name)));
 
 let usesImage = (~image) =>
@@ -42,16 +42,21 @@ let getStacks = client =>
     |> then_(x => x##data)
   );
 
-let upgrade = (~stack, ~image, client) => {
+let findStack = (~client, stackName) => {
   open Js.Promise;
-  Js.log("Upgrading " ++ stack ++ " using " ++ image ++ " image");
   getStacks(client)
   |> then_(x =>
        x##data
-       |> findStack(~name=stack)
+       |> findByName(~name=stackName)
        |> Belt.Option.getExn
        |> (st => st##links##services |> Instance.get(client.axios))
-     )
+  )
+};
+
+let upgrade = (~stack, ~image, client) => {
+  open Js.Promise;
+  Js.log("Upgrading " ++ stack ++ " using " ++ image ++ " image");
+  findStack(~client, stack)
   |> then_(x =>
        x##data##data
        |> usesImage(~image)
@@ -59,7 +64,7 @@ let upgrade = (~stack, ~image, client) => {
      )
   |> catch(_err =>
        Belt.Result.Error(
-         "Can not find stack '" ++ stack ++ "' containing service with " ++ image,
+         "Can not find stack -" ++ stack ++ "- containing service with " ++ image,
        )
        |> resolve
      );
